@@ -3,49 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Manager</title>
+    <title>Task Manager Pro</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>📝 Task Manager</h1>
+        <header class="app-header">
+            <h1>📝 Task Manager Pro</h1>
+            <div class="header-actions">
+                <button id="darkModeToggle" class="icon-btn" title="Toggle Dark Mode">🌙</button>
+                <button id="exportBtn" class="icon-btn" title="Export Tasks">📥</button>
+                <button id="bulkDeleteBtn" class="icon-btn" title="Bulk Delete" style="display: none;">🗑️</button>
+            </div>
+        </header>
         
         <!-- Task Form -->
         <form id="taskForm" class="task-form">
-            <input type="hidden" id="taskId">
-            <input type="text" id="taskTitle" placeholder="Task title *" required>
-            <textarea id="taskDescription" placeholder="Task description" rows="3"></textarea>
+            <div class="form-row">
+                <input type="text" id="taskTitle" placeholder="Task title *" required>
+            </div>
+            
+            <div class="form-row">
+                <textarea id="taskDescription" placeholder="Task description" rows="3"></textarea>
+            </div>
+            
+            <div class="form-row form-grid">
+                <div class="form-group">
+                    <label for="taskPriority">Priority</label>
+                    <select id="taskPriority">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskCategory">Category</label>
+                    <input type="text" id="taskCategory" placeholder="e.g., Work, Personal" list="categoryList">
+                    <datalist id="categoryList"></datalist>
+                </div>
+                
+                <div class="form-group">
+                    <label for="taskDueDate">Due Date</label>
+                    <input type="datetime-local" id="taskDueDate">
+                </div>
+            </div>
+            
             <div class="form-actions">
-                <button type="submit" id="submitBtn">Add Task</button>
+                <button type="submit" id="submitBtn">➕ Add Task</button>
                 <button type="button" id="cancelBtn" class="btn-cancel" style="display: none;">Cancel</button>
             </div>
         </form>
 
-        <!-- Filters and Search -->
+        <!-- Enhanced Stats -->
+        <div class="task-stats">
+            <div class="stat stat-total">
+                <span class="stat-number" id="totalTasks">0</span>
+                <span class="stat-label">Total</span>
+            </div>
+            <div class="stat stat-active">
+                <span class="stat-number" id="activeTasks">0</span>
+                <span class="stat-label">Active</span>
+            </div>
+            <div class="stat stat-completed">
+                <span class="stat-number" id="completedTasks">0</span>
+                <span class="stat-label">Completed</span>
+            </div>
+            <div class="stat stat-high">
+                <span class="stat-number" id="highPriorityTasks">0</span>
+                <span class="stat-label">High Priority</span>
+            </div>
+            <div class="stat stat-overdue">
+                <span class="stat-number" id="overdueTasks">0</span>
+                <span class="stat-label">Overdue</span>
+            </div>
+        </div>
+
+        <!-- Controls -->
         <div class="controls">
             <div class="search-box">
                 <input type="text" id="searchInput" placeholder="🔍 Search tasks...">
             </div>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="active">Active</button>
-                <button class="filter-btn" data-filter="completed">Completed</button>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label>Status:</label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-filter="all">All</button>
+                        <button class="filter-btn" data-filter="active">Active</button>
+                        <button class="filter-btn" data-filter="completed">Completed</button>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Priority:</label>
+                    <div class="filter-buttons">
+                        <button class="priority-filter-btn active" data-priority="all">All</button>
+                        <button class="priority-filter-btn" data-priority="high">🔴 High</button>
+                        <button class="priority-filter-btn" data-priority="medium">🟡 Medium</button>
+                        <button class="priority-filter-btn" data-priority="low">🟢 Low</button>
+                    </div>
+                </div>
+                
+                <div class="filter-group">
+                    <label>Category:</label>
+                    <select id="categoryFilter" class="category-select">
+                        <option value="all">All Categories</option>
+                    </select>
+                </div>
             </div>
-        </div>
-
-        <!-- Task Stats -->
-        <div class="task-stats">
-            <div class="stat">
-                <span class="stat-number" id="totalTasks">0</span>
-                <span class="stat-label">Total</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number" id="activeTasks">0</span>
-                <span class="stat-label">Active</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number" id="completedTasks">0</span>
-                <span class="stat-label">Completed</span>
+            
+            <div class="bulk-actions">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="selectAllCheckbox">
+                    <span>Select All</span>
+                </label>
             </div>
         </div>
 
@@ -64,15 +136,45 @@
     <div id="editModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Edit Task</h2>
+                <h2>✏️ Edit Task</h2>
                 <span class="close">&times;</span>
             </div>
             <form id="editForm">
                 <input type="hidden" id="editTaskId">
-                <input type="text" id="editTaskTitle" placeholder="Task title *" required>
-                <textarea id="editTaskDescription" placeholder="Task description" rows="4"></textarea>
+                
+                <div class="form-group">
+                    <label for="editTaskTitle">Title</label>
+                    <input type="text" id="editTaskTitle" placeholder="Task title *" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editTaskDescription">Description</label>
+                    <textarea id="editTaskDescription" placeholder="Task description" rows="4"></textarea>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editTaskPriority">Priority</label>
+                        <select id="editTaskPriority">
+                            <option value="low">🟢 Low</option>
+                            <option value="medium">🟡 Medium</option>
+                            <option value="high">🔴 High</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editTaskCategory">Category</label>
+                        <input type="text" id="editTaskCategory" placeholder="Category">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="editTaskDueDate">Due Date</label>
+                        <input type="datetime-local" id="editTaskDueDate">
+                    </div>
+                </div>
+                
                 <div class="modal-actions">
-                    <button type="submit" class="btn-save">Save Changes</button>
+                    <button type="submit" class="btn-save">💾 Save Changes</button>
                     <button type="button" class="btn-cancel-modal">Cancel</button>
                 </div>
             </form>
